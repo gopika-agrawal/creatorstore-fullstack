@@ -1,0 +1,12 @@
+# frontend
+frontend/node_modules
+
+# backend
+backend/target
+
+# env files
+backend/.env
+frontend/.env
+
+# vscode
+.vscode
