@@ -3,9 +3,16 @@ import React, { useState } from 'react'
 const ProductForm = (props) => {
 
     const setShowForm = props.setShowForm;
+    const addProduct = props.addProduct;
+    const editProduct = props.editProduct;
+    const setProduct = props.setProduct;
 
     const [formData, setFormData] = useState({
-        name:"",description:"",category:"",price:"",stockQuantity:""
+        name: editProduct?.name || "",
+        description: editProduct?.description || "",
+        category: editProduct?.category || "",
+        price: editProduct?.price || "",
+        stockQuantity: editProduct?.stockQuantity || ""
     });
 
     const changeHandler = (event) => {
@@ -15,6 +22,7 @@ const ProductForm = (props) => {
             ? Number(value)
             : value}));
     }
+
 
     // const submitHandler = (e) => {
     //     e.preventDefault();
@@ -32,38 +40,98 @@ const ProductForm = (props) => {
 
 
 
+    // const submitHandler = async(e) => {
+    //     try{
+    //         e.preventDefault();
+
+    //         const response = await fetch("http://localhost:8080/api/products", {
+    //             method: "POST",
+
+    //             headers: {
+    //                 "Content-Type": "application/json"
+    //             },
+
+    //             body: JSON.stringify(formData)
+    //         });
+
+    //         const data = await response.json();
+
+    //         addProduct(data);
+
+    //         console.log(data);
+    //         // setFormData("");     works fine but it is an object not a string
+    //         setFormData({
+    //             name:"",
+    //             description:"",
+    //             category:"",
+    //             price:0,
+    //             stockQuantity:0
+    //         })
+    //         setShowForm(false);
+    //     }
+    //     catch(error){
+    //         console.log(error);
+    //     }
+    // }
+
+
+
+
     const submitHandler = async(e) => {
-        try{
-            e.preventDefault();
+        if(editProduct){
+            try{
+                const response = await fetch(`http://localhost:8080/api/products/${editProduct.id}`, {
+                    method: "PUT",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(formData)
+                });
 
-            const response = await fetch("http://localhost:8080/api/products", {
-                method: "POST",
+                const data = await response.json();
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                setProduct((prev) => 
+                  prev.map((pr) => 
+                    pr.id === data.id ? data : pr
+                )  
+                );
+                setFormData({
+                    name:"",
+                    description:"",
+                    category:"",
+                    price:0,
+                    stockQuantity:0
+                })
+                setShowForm(false);
 
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-
-            console.log(data);
-            // setFormData("");     works fine but it is an object not a string
-            setFormData({
-                name:"",
-                description:"",
-                category:"",
-                price:0,
-                stockQuantity:0
-            })
-            setShowForm(false);
+            }
+            catch(error){
+                console.log(error);
+            }
         }
-        catch(error){
-            console.log(error);
+        else{
+            try{
+                const response = await fetch("http://localhost:8080/api/products", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                addProduct(data);
+                setFormData({
+                    name:"",
+                    description:"",
+                    category:"",
+                    price:0,
+                    stockQuantity:0
+                })
+                setShowForm(false);
+
+            }
+            catch(error){
+                console.log(error);
+            }   
         }
     }
-
 
 
 

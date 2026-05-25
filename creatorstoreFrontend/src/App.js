@@ -9,8 +9,9 @@ function App() {
 
   const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async() => {
+  const [editProduct, setEditProduct] = useState("");
+
+  const fetchData = async() => {
     try{
       const response = await fetch("http://localhost:8080/api/products");
       const data = await response.json();
@@ -21,13 +22,26 @@ function App() {
       console.log(error);
     }
   }
+
+  useEffect(() => {
   fetchData();
-  },[showForm]);
+  },[]);
+
+
+  const addProduct = (newProduct) => {
+    setProduct((prev) => [...prev,newProduct]);
+  }
+
+
+  const editHandler = (product) => {
+    setEditProduct(product);
+    setShowForm(true);
+  }
 
 
   const deleteProduct = async(delId) => {
     try{
-      fetch(`http://localhost:8080/api/products/${delId}`,
+      await fetch(`http://localhost:8080/api/products/${delId}`,
         {
           method: "DELETE"
         }
@@ -42,7 +56,6 @@ function App() {
     }
   }
 
-
   const clickHandler = () => {
     setShowForm(true);
   }
@@ -51,10 +64,10 @@ function App() {
     <div className="App">
         <div className='container'>
           <h1>Products:-</h1>
-            { product &&
+            {
               product.map((pro) => (
                 <div key={pro.id}>
-                  <Card pro={pro} deleteProduct={deleteProduct}/>
+                  <Card pro={pro} deleteProduct={deleteProduct} editHandler={editHandler}/>
                 </div>
               ))
             }
@@ -62,7 +75,7 @@ function App() {
         <div>
           {
             showForm ? 
-            <ProductForm setShowForm={setShowForm}/> :
+            <ProductForm setShowForm={setShowForm} addProduct={addProduct} editProduct={editProduct} setProduct={setProduct}/> :
             <button onClick={clickHandler} className='formShow'>show</button>
           }
         </div>
